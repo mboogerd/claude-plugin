@@ -50,16 +50,29 @@ After every commit on `main`, `git -C "$P" push origin main`: cloud teams start 
 
 ## 1. The loop
 
-1. Keep as many slices in flight as can run without sharing a file, and one sketched ahead per
-   active project. Every team runs in a cloud; nothing runs on the Mac but you and your read-only
+1. **A target, not a cap.** Keep 4 slices in flight across the collection's active projects, and on
+   each wake count them: below 4, sketch and hand out until you are at 4 again. A plan that cannot
+   reach the target is a finding: say in your report why (one chain, every lane blocked) and what
+   would free a lane. Every team runs in a cloud; nothing runs on the Mac but you and your read-only
    deliberation calls to Codex (section 5; `README`, "Nothing runs on the Mac").
-2. Hand out a sketched slice when it shares no file with a slice in flight in the same project
-   (section 3). Each sketch lists the folders it touches under `Touches`; once the
-   foreman's briefs are on `slice/<id>`, their `## Files` say it exactly.
-3. While slices are in flight: on each wake, move every slice whose watcher returned one step
-   (section 4), answer questions (section 5), and sketch the next one. Look at the clock: a slice in
-   flight for more than a working day gets weighed again (`README`, "Time and value").
-4. On `VERDICT: approve` and green CI: merge and record it (section 6), then go to 1.
+2. **Lanes by area.** Fill the target from these lanes, so that one blocked chain never empties the
+   factory; keep one sketch ahead in each lane:
+   - the main line: the next step of the order of work in each active project;
+   - upkeep: one standing upkeep slice per active project while its `Upkeep` holds work (section 2);
+   - consumer halves: a project's slice that uses another project's interface, built against that
+     interface as written, with a fake, beside the provider's slice (section 2).
+   Pick the sketches of the lanes so that their `Touches` do not overlap.
+3. Hand out a sketched slice when it edits no file that a slice in flight in the same project edits
+   (section 3). Each sketch lists the folders it touches under `Touches`; once the foreman's briefs
+   are on `slice/<id>`, their `## Files` say it exactly. **A dependent slice does not wait:** when the
+   next slice of a chain needs an interface that a slice in flight is building, hand it out beside
+   that slice. It builds against the interface as it stands on that slice's branch, adds its own
+   files next to it, edits none of that slice's files beyond a wiring line, and merges `main` once
+   that slice merges (the build brief says so). Two slices editing the same file stay forbidden.
+4. While slices are in flight: on each wake, move every slice whose watcher returned one step
+   (section 4), answer questions (section 5), and refill the lanes (1, 2). Look at the clock: a slice
+   in flight for more than a working day gets weighed again (`README`, "Time and value").
+5. On `VERDICT: approve` and green CI: merge and record it (section 6), then go to 1.
 
 ## 2. Sketch a slice
 
@@ -78,8 +91,9 @@ as a question in every round. Note `spec-check <sha>` in `PLAN.md`: the next run
 
 A story that needs another project too (a client and the service part it needs) becomes one
 slice per project, with the interface between them written the same in both sketches. Hand out
-the provider's slice first; the other waits until it merged, or its sketch says how it fakes the
-provider meanwhile (`README`, "Slices that span projects").
+the provider's slice first, and the consumer's beside it, not after it: its sketch says how it fakes
+the provider until that merges, and its last task runs its outcomes on the real provider once it has
+(`README`, "Slices that span projects"). Only a consumer that cannot be faked waits.
 
 A part that the decompose skill marks ready in `<collection>/initiatives/<slug>.md` enters
 `PLAN.md` as an entry `Initiative part: <slug> / <part>`, with the ledger's link, the part, its whole
@@ -98,9 +112,11 @@ slice in flight is one. The foreman splits it over parallel implementers when it
 such a reason joins the next sketch instead.
 
 Small work that is no story (fixes, flakes, follow-ups, `Friction` items, test-cost cuts) waits
-under `Upkeep` in `PLAN.md`. When it adds up to about 3 tasks, or every few deliveries, it goes out
-as one upkeep slice: its outcomes are each item's check, not a story. A fix that guards `main` or
-unblocks a slice in flight does not wait.
+under `Upkeep` in `PLAN.md`. It runs in its own lane (section 1): while `Upkeep` holds work, one
+upkeep slice per active project is in flight or sketched, guards first, then the items in the
+folders no other slice in flight touches. Its outcomes are each item's check, not a story, and it is
+exempt from the size rule below. A fix that guards `main` or unblocks a slice in flight does not
+wait for the next upkeep slice.
 
 Keep it a sketch: the foreman plans the slice and writes the task briefs.
 
@@ -223,6 +239,9 @@ You are the build team for slice <id> of <owner/repo>: <story>. Follow .claude/s
 as a cloud build team (sections 1, 2, 4, 5). The sketch: factory/PLAN.md, "<id>". Work on branch
 slice/<id> from origin/main; push only that branch; open its PR against main; never merge, never
 arm auto-merge. The review team is <other vendor>; you will not hear from it in this session.
+<When it runs beside a slice whose interface it needs (section 1, item 3): Slice <x> (PR #<n>, branch
+slice/<x>) runs beside you: build against its interface as it is on that branch, add your files next
+to it, edit none of its files beyond a wiring line, and merge main into slice/<id> once it merges.>
 ```
 
 **Review** (round `r`, to the reviewer):
