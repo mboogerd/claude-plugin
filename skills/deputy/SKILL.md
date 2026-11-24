@@ -380,8 +380,11 @@ under `Human answers` in `PLAN.md` and in the record's `human:` line.
 
 ## 6. Merge and record
 
-Auto-merge is retired: every PR is authored by the human's account, so no GitHub approval is
-possible, and the ruleset blocks auto-merge. You merge.
+You merge, without asking the human: the merge rules below are the check. A project's main is
+guarded by its own ruleset (required checks, no force-push, no deletion), and the ruleset that keeps
+pushes on `slice/*` excludes the default branch, so an approved PR with green checks merges with no
+bypass; `--admin` is never needed for it, and a merge that GitHub refuses without it is a finding
+(a missing check or a ruleset that covers main), not a reason to bypass.
 1. Merge only when all hold: the last review's verdict is `VERDICT: approve`, each risk it proposes
    to accept is accepted by you or the human (section 4, "Progress, not a cap"); its user-sim line is
    `ACCEPTED` and its adversary line `HELD`, `BREACHED` with every breach fixed or accepted, or
@@ -395,7 +398,7 @@ possible, and the ruleset blocks auto-merge. You merge.
 2. CI red: rerun the failed jobs once if the test passed in the slice's own runs; red again, or red
    in a build or lint step, goes to the builder as an answer brief with the job and its lines as
    finding `F<r>.ci`, and the push after it gets one more review round.
-3. `gh pr merge <n> --admin --rebase`. Then `git -C "$P" pull --rebase origin main`. A red CI run
+3. `gh pr merge <n> --rebase`; a branch with merge commits of main takes `--squash`. Then `git -C "$P" pull --rebase origin main`. A red CI run
    on `main`: fix `main` first, with a fix slice next.
 4. Mark the slice
    done in `PLAN.md` with one digest line (what a person can now do), the builder and the rounds, its
