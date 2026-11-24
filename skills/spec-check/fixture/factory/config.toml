@@ -1,0 +1,3 @@
+# Calibration fixture for spec-check (skills/spec-check/SKILL.md, section 9). Not a real project.
+[spec]
+levels = ["spec/VISION.md", "spec/FUNCTIONAL.md", "spec/TECHNICAL.md"]

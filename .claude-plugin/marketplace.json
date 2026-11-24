@@ -1,0 +1,8 @@
+{
+  "name": "mboogerd",
+  "description": "mboogerd's personal Claude Code plugin.",
+  "owner": { "name": "mboogerd" },
+  "plugins": [
+    { "name": "mboogerd", "source": "./", "description": "Personal skills and agents." }
+  ]
+}
