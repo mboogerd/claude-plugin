@@ -64,11 +64,14 @@ After every commit on `main`, `git -C "$P" push origin main`: cloud teams start 
    Pick the sketches of the lanes so that their `Touches` do not overlap.
 3. Hand out a sketched slice when it edits no file that a slice in flight in the same project edits
    (section 3). Each sketch lists the folders it touches under `Touches`; once the foreman's briefs
-   are on `slice/<id>`, their `## Files` say it exactly. **A dependent slice does not wait:** when the
-   next slice of a chain needs an interface that a slice in flight is building, hand it out beside
-   that slice. It builds against the interface as it stands on that slice's branch, adds its own
-   files next to it, edits none of that slice's files beyond a wiring line, and merges `main` once
-   that slice merges (the build brief says so). Two slices editing the same file stay forbidden.
+   are on `slice/<id>`, their `## Files` say it exactly. **A dependent slice does not wait for the merge:**
+   when the next slice of a chain needs an interface that a slice in flight is building, hand it out
+   as soon as that slice's branch holds a first version of the interface (pushed code, not only the
+   spec), even while its review may still change details. Until then it waits, or, for another
+   project's interface, takes the consumer-half lane on a fake. It builds against the interface as
+   it stands on that branch, adds its own files next to it, edits none of that slice's files beyond a
+   wiring line, and merges `main` once that slice merges, adapting to what review changed (the build
+   brief says so). Two slices editing the same file stay forbidden.
 4. While slices are in flight: on each wake, move every slice whose watcher returned one step
    (section 4), answer questions (section 5), and refill the lanes (1, 2). Look at the clock: a slice
    in flight for more than a working day gets weighed again (`README`, "Time and value").
