@@ -451,13 +451,15 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
    did not yet write down. Commit and push.
-2. Start your successor as its own top-level background session, not with `start_session` (that
-   links it to you and wakes you on each of its turns). `<n>` is your own number (`deputy-<n>`), or 0:
-   `( cd "$P" && claude --bg -n deputy-<n+1> --model <config foreman_model> --permission-mode auto
-   "/deputy <project>: you take over from <your name>; read '## Deputy handover' in factory/PLAN.md first" )`.
-   It needs the browser pane for Codex rounds; tell the human if it runs where there is none.
+2. Start your successor as a Desktop session, with `start_session` (`initiation` "user_asked", `context`
+   "fresh", `cwd` the project, `use_worktree` false, `permission_mode` "auto", `name` `deputy-<n+1>`,
+   prompt `/deputy <project>: you take over from <your name>; read '## Deputy handover' in
+   factory/PLAN.md first`). Never `claude --bg`: a terminal background session has neither the
+   browser pane (Codex rounds) nor the routine scope (`RemoteTrigger` answers 401), so it can merge
+   but dispatch nothing (deputy-4, 2026-11-25). The new session is linked to you and its turns wake
+   you: from then on answer each such note with nothing and end.
 3. Stop your background watchers (`TaskStop`), tell the human in one line that the deputy now runs as
-   `deputy-<n+1>` (`claude attach deputy-<n+1>`), and end your turn. Do nothing after that.
+   `deputy-<n+1>` (in the Desktop app's sidebar), and end your turn. Do nothing after that.
 
 Taking over: read `## Deputy handover`, start the one watcher (`watch-all.sh`, a fresh state file:
 its first run records a baseline), then delete the section, commit and push.
