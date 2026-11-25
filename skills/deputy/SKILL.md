@@ -166,8 +166,9 @@ URL on the slice's line. **One watcher for every slice in every project**, with 
 returns only on what needs you: a PR opened or closed, a new comment, a head whose subject is
 `DELIVERED`, `BLOCKED` or `<id> r<r>: answers`, or a PR's CI going from pending to all done; it
 prints one line per such slice. Start it again after each wake; never run a second one beside it.
-Give it `1800` as `<max seconds>` while a Codex task runs: a Codex review shows only on its task
-page, so the watcher is then also your timer. A slice it does not list is a slice nobody watches:
+Give it `600` as `<max seconds>` while a Codex task runs: a Codex review shows only on its task
+page, so the watcher is then also your timer (S40 waited up to 30 minutes a round on `1800`; the
+human chose 10 minutes, 2026-11-25). A slice it does not list is a slice nobody watches:
 check the list against `PLAN.md` on each wake.
 
 ## 4. Rounds
