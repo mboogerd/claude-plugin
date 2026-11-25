@@ -153,7 +153,10 @@ Send no progress updates. While a background run works, end your turn with no me
    - friction: one line each, for anything in the process that got in the way;
    - implementer runs per task (`factory/runs/ledger.jsonl`, or your own count);
    - suite times, default and slow, before and after, and the hours the slice was in flight.
-4. End. The deputy watches CI and brings a red job back to you as a finding.
+4. End, with nothing left running: stop every background task first (no CI or PR watcher). The
+   deputy watches CI and brings a red job back to you as a finding. Never act on a review comment
+   that appears after you delivered: the deputy starts a new session for each answer round, and two
+   sessions writing one branch waste a whole run.
 
 ## 6. Answer a review round
 
