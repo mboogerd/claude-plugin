@@ -160,19 +160,22 @@ and `[agents]` names other agent files for a role. Rules 1 and 4 hold for every 
 
 Mark the slice `in flight (cloud, builder <vendor>)` in `PLAN.md`, commit and push. Dispatch the
 build brief (section 4a) to the builder's side (4b or 4c), put the routine id or the Codex task
-URL on the slice's line, and start its watcher with Bash `run_in_background`:
-`cd "$P" && <collection>/factory/scripts/watch-pr.sh <id> "<state seen>" [<max seconds>]`
-(the collection's copy, for every project: a project's own may be older). It returns when the PR
-opens, its head moves, it gets a comment, or it closes; its first line is the next `<state seen>`.
+URL on the slice's line. **One watcher for every slice in every project**, with Bash
+`run_in_background`: `<collection>/factory/scripts/watch-all.sh <state file> [<max seconds>] [<repo> ...]`
+(the collection's copy; the state file in your scratchpad, so it survives your restarts of it). It
+returns only on what needs you: a PR opened or closed, a new comment, a head whose subject is
+`DELIVERED`, `BLOCKED` or `<id> r<r>: answers`, or a PR's CI going from pending to all done; it
+prints one line per such slice. Start it again after each wake; never run a second one beside it.
 Give it `1800` as `<max seconds>` while a Codex task runs: a Codex review shows only on its task
-page, so the watcher is then also your timer.
+page, so the watcher is then also your timer. A slice it does not list is a slice nobody watches:
+check the list against `PLAN.md` on each wake.
 
 ## 4. Rounds
 
 A round is one review and its answer. Round `r` starts when the builder pushes (round 1: the PR
 opens) and ends when the builder pushes its answers to review `r`.
 
-| The watcher shows | You do |
+| The watcher shows (per slice) | You do |
 |---|---|
 | a PR opened (or `nopr` with a `DELIVERED` commit: open the PR yourself, `gh pr create --head slice/<id> --body-file <its body>`) | dispatch review brief, round 1, to the reviewer's side |
 | a new head with subject `<id> r<r>: answers` | dispatch review brief, round `r+1` |
@@ -180,7 +183,8 @@ opens) and ends when the builder pushes its answers to review `r`.
 | a comment ending `VERDICT: approve` | its polish to `Upkeep` (below), then section 6 |
 | a head with subject `BLOCKED <id>` | answer it (section 5), then a build brief "continue from branch `slice/<id>`; the answer: ..." |
 | the timer, a Codex task in flight | open its task page (4c); finished: carry its result to the PR as below |
-| nothing else changed (a CI comment, a bot) | start the watcher again with the new state |
+| CI all done on a delivered PR whose review is not yet out | dispatch review round 1 if all green; a red job goes to the builder as a finding |
+| nothing else changed | start the watcher again |
 
 **Carry a result to the PR.** A Codex review ends on its task page, not on the PR; a Claude reviewer
 without GitHub tools ends in its run log (`RemoteTrigger` `list_runs`, then `get_run_log`). Post it
@@ -216,9 +220,13 @@ You weigh that call against the vision and functional spec, which you know bette
   only when the vision or functional spec promises the behaviour, and then name the outcome, not
   the design: how is the build team's. A new module or state that appears in an answer round is a
   warning for the next review, not a fix.
-- **Cut early.** When one part of a slice is stalled, bring the human the minimal version against
-  the spec's literal words (what it keeps, what becomes a known limit) by round 3, and hold that
-  part; do not run more rounds on it while you wait.
+- **Cut early, yourself.** When one part of a slice is stalled, cut it by round 3: rule the minimal
+  version against the spec's literal words (what it keeps, what becomes a known limit), send it to
+  the builder as the next answer's ruling, and merge on approval as usual. Record the cut on the
+  slice's line, put the dropped part under `Upkeep` or as the next slice's sketch, and list it once
+  under `Cuts` in your report; the human may veto it, and the undo is that follow-up slice. Do not
+  wait for the human: a cut held overnight costs a night. Ask first (section 5) only when the cut
+  drops something a vision document promises or weakens a security check.
 - **Waiting is no reason for a round.** A slice that waits on another (a provider, a merge) gets
   no round because "it waits anyway": every round costs agents and the human's reading. Leave it
   approved-pending or held, and spend the rounds on the next slice.
@@ -279,25 +287,34 @@ Round 0 and each fresh round: a one-off routine (`RemoteTrigger`, action `create
    "parent_tool_use_id": null, "message": {"role": "user", "content": "<the brief>"}}}]}}}
 ```
 
-One source only: with two, the session starts outside the project. Later rounds of the same team go
-into its earlier session where possible, so it keeps what it learned: `update` the routine with an
-event whose `session_id` is that run's session (`list_runs`) and the new brief, then `run` it. If the
-API refuses, a new routine like the one above; the PR thread is its memory. A Claude reviewer has the
-`Agent` tool for the three review subagents.
+One source only: with two, the session starts outside the project. **A new routine for every round**;
+never `update` and `run` an old one, which fires its old brief. The PR thread is the new session's
+memory. A Claude reviewer has the `Agent` tool for the three review subagents.
+
+**One writer per branch.** Before you start an answer or build routine on `slice/<id>`, check that no
+earlier session still writes it: `list_runs` on the slice's last Claude build or answer routine; if
+its session's `last_event_at` is under 20 minutes old, or the branch got a push after the review
+you are answering, that session is still at work. Wait for its push (the watcher) instead of starting
+a second writer. Two writers on one branch cost a whole run, as on S118 r1.
 
 ### 4c. Codex side: the browser pane
 
 The Codex CLI cannot dispatch to the three-repository environment (openai/codex#50182), and computer
 use is not allowed. Use your built-in browser pane (`mcp__Claude_Browser__*`), signed in to
 chatgpt.com as the human:
-1. `navigate` to `https://chatgpt.com/codex/cloud` and wait a few seconds for the Codex app (the
-   composer "What should we build?"). Not `https://chatgpt.com/codex`: that is a marketing page
-   ("Build anything with Codex") even when signed in, so it is no sign of being signed out.
-2. Click the environment chip above the composer (it reads "Default environment" or the last one
-   used). In its menu press ↓, then → to expand **Cloud**, and pick the config's `codex_env`
-   (`watane`: the environment with all three repositories). Check the chip now shows it.
-3. Click the composer, type the brief, and Send. Read the new task's URL from the task list or the
-   page (`chatgpt.com/codex/tasks/...` or `chatgpt.com/local/...`) and put it on the slice's line.
+Every browser call costs a re-read of your whole context, so dispatch in two `browser_batch` calls,
+with no screenshots:
+1. A new task: `[navigate https://chatgpt.com/codex/cloud, computer wait 4, javascript_tool
+   "document.querySelector('main').innerText.slice(-400)"]`. The text must show the composer and the
+   chip with the config's `codex_env` (`watane`). Not `https://chatgpt.com/codex`: that is a
+   marketing page even when signed in. A follow-up to an existing task (an answer round to Codex):
+   navigate to its task URL instead.
+2. `[computer left_click on the composer ("Do anything" or "Ask for follow-up changes", found with
+   find), computer type <the brief>, computer key Return, computer wait 8, javascript_tool
+   "location.href"]`. The URL (`chatgpt.com/local/...` or `chatgpt.com/codex/tasks/...`) goes on
+   the slice's line.
+Only when the chip shows another environment: click it, press ↓, then → to expand **Cloud**, pick
+`codex_env`, and check the chip before step 2.
 
 Codex pushes and opens or updates the PR itself through its GitHub integration, as the human's
 account. That account is an admin, so no ruleset holds it to `slice/*`: only the brief does. After
@@ -423,15 +440,16 @@ bypass; `--admin` is never needed for it, and a merge that GitHub refuses withou
 
 ## 8. Hand over to a fresh deputy
 
-Every wake re-reads your whole context, so a long-lived deputy costs more per wake than a slice's work.
-After you merged a slice, hand over when you merged three since you started, or your context is over
-150k tokens (`get_usage`, where you have it):
+Every wake re-reads your whole context, so a long-lived deputy costs more per wake than a slice's work:
+deputy-3 ran 22 hours to a median of 490k tokens per call, 765M tokens in all. **On every wake**,
+before anything else, check: you merged three slices since you started, or you have run 6 hours, or
+your context is over 300k tokens (`get_usage`, where you have it). If any holds, finish only the step
+in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
 0. Scan the front matter of the decision records since the last handover (`deliberation.md`,
    section 7): a `trigger` and `docs` pair seen three times, or a human veto of a rung 2 conclusion,
    becomes a proposal to the human for a spec rule or a ladder change, since it marks a missing rule.
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
-   reviewer, the routine ids, Codex task URLs or session id, PR, round, the watcher's
-   last `<state seen>`, and what you wait on; questions you sent and their state; what you decided but
+   reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
    did not yet write down. Commit and push.
 2. Start your successor as its own top-level background session, not with `start_session` (that
    links it to you and wakes you on each of its turns). `<n>` is your own number (`deputy-<n>`), or 0:
@@ -441,5 +459,5 @@ After you merged a slice, hand over when you merged three since you started, or 
 3. Stop your background watchers (`TaskStop`), tell the human in one line that the deputy now runs as
    `deputy-<n+1>` (`claude attach deputy-<n+1>`), and end your turn. Do nothing after that.
 
-Taking over: read `## Deputy handover`, start one watcher per slice in flight (`watch-pr.sh` with its
-state), then delete the section, commit and push.
+Taking over: read `## Deputy handover`, start the one watcher (`watch-all.sh`, a fresh state file:
+its first run records a baseline), then delete the section, commit and push.
