@@ -85,7 +85,7 @@ new or reworded vision sentence change it. When you cannot tell, it changes mean
 ## 3. Link lines (commit 3)
 
 - Each FUNCTIONAL area gets `(serves <ids>)` in its heading. Take the goals from what the area
-  already cites (a step of the vision's order of work names goals; a subsystem's Goals served
+  already cites (an outcome of the vision's Priorities names goals; a subsystem's Goals served
   table names them). Mark each link you inferred rather than read in the PR's link table, so the
   human checks those first.
 - An area no goal motivates is a C1 gap: draft the vision sentence that would motivate it as a

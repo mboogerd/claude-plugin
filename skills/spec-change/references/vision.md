@@ -16,9 +16,14 @@ decision. Readers: the human, the deputy choosing the next slice, any agent judg
   numbered goals `V1..`, each an outcome for a named kind of person; non-goals `VB1..`, each phrased
   so that a requirement could violate it; and success criteria a person can observe. These are what
   the lower documents cite, so without them nothing below can be checked.
-- It should hold the order of work as a priority between goals, and what waits until later.
-- It may hold principles that trade one goal against another ("V5 beats V3 when they conflict") and
-  named people or personas.
+- It should hold trade-offs: principles that settle a conflict between goals ("V5 beats V3 when
+  they conflict"), each naming the goals it ranks. They are what an agent cites when two goals pull
+  apart, so without them each conflict goes to the human.
+- It should hold priorities: a ranked list of outcomes, each in words a person could observe and
+  naming the goals it serves, with what waits until later and for what. It ranks; it does not
+  schedule. Steps, their numbers, dependencies between them, status and what may run in parallel
+  belong in the build plan, which breaks each outcome down and cites it by its words.
+- It may hold named people or personas.
 - It must not hold technology, formats, part names, requirement ids, slice or step ids, status,
   completion dates, file paths or links to lower documents: each fails the redesign test and goes
   stale when the product changes underneath.
@@ -26,10 +31,12 @@ decision. Readers: the human, the deputy choosing the next slice, any agent judg
   their need" is a goal.
 
 Checks: every goal passes the redesign test; every goal is served by at least one functional area
-(`spec-lint` M5); every non-goal can be violated; no sentence says how; under about 1200 words.
+(`spec-lint` M5); every non-goal can be violated; every trade-off names two goals; every priority
+names its goals and holds no step id, status or link; no sentence says how; under about 1200 words.
 
-Failures to watch for: the vision as roadmap (status and step numbers creep in); the vision as
-feature list; goals so broad nothing violates them; no non-goals.
+Failures to watch for: the vision as roadmap (status, step numbers, "each step before the next"
+or links to the plan creep into Priorities); the vision as feature list; goals so broad nothing
+violates them; no non-goals.
 
 ## Subsystem VISION: a responsibility charter
 
@@ -67,7 +74,8 @@ design.
 ## Never           (S) - **<sub>:VB1** Never <thing>: <owner> does.
 ## Non-goals       (P) - **VB1** <what the product will not be>
 ## Collaborators   (S) Relies on / relied on by, by role.
-## Order of work   (P, should) Priority between goals; no status.
+## Trade-offs      (P, should) - V.. beats V.. when <conflict>. No id: the goals name it.
+## Priorities      (P, should) 1. <outcome> (V..). Ranked; no step ids, status or links.
 ## Success         Observable outcomes of the current horizon.
 ## Later           (may) What waits, and for what.
 ## Open            (may) - O-1 <question>. Options: ... Owner: the human.
