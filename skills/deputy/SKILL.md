@@ -487,7 +487,9 @@ first get the latest plugin. A clear does not reload plugins, and a slash comman
 `claude plugin marketplace update mboogerd && claude plugin update mboogerd@mboogerd`, then read
 `installPath` for `mboogerd@mboogerd` in `~/.claude/plugins/installed_plugins.json`. If it differs
 from the base directory this skill loaded from, read `<installPath>/skills/deputy/SKILL.md` and follow
-that text instead of this one from here on. Then read
+that text instead of this one from here on, and read every other file of this plugin from
+`<installPath>` too (`deliberation.md`, and the `SKILL.md` of any of its skills you invoke). The
+standing sessions never restart, so this is the only way they get a new version. Then read
 `## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
 task page as they are now and act on what changed, since your watcher's first run only records a
 baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
