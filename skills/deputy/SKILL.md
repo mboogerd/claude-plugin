@@ -62,6 +62,10 @@ After every commit on `main`, `git -C "$P" push origin main`: cloud teams start 
    - consumer halves: a project's slice that uses another project's interface, built against that
      interface as written, with a fake, beside the provider's slice (section 2).
    Pick the sketches of the lanes so that their `Touches` do not overlap.
+   **When the next step is blocked, look for the most valuable move the vision allows before falling
+   back to upkeep:** the parts of it that don't wait (a design slice, a spike, a fake for the missing
+   piece) or the next priority whose files don't overlap. Designing or probing a later outcome changes
+   no priority; only building it ahead of a higher one does, and that is the human's call.
 3. Hand out a sketched slice when it edits no file that a slice in flight in the same project edits
    (section 3). Each sketch lists the folders it touches under `Touches`; once the foreman's briefs
    are on `slice/<id>`, their `## Files` say it exactly. **A dependent slice does not wait for the merge:**
@@ -437,7 +441,8 @@ bypass; `--admin` is never needed for it, and a merge that GitHub refuses withou
    decisions and friction lines, its suite times and its hours in flight. Move its sketch out of
    `PLAN.md` to the end of `factory/DONE.md` (read it only when a question needs it): `PLAN.md` is
    read on every wake and must not grow with history. Commit and push.
-5. Report to the human: one line per slice, project first, decisions first.
+5. Report to the human: one line per slice, project first, decisions first. Per run, say what moved
+   the vision forward and what was upkeep: a run of only upkeep is a finding, not a full factory.
 6. Hand over if it is time (section 8).
 
 ## 7. Keep it lean
