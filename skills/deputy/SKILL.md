@@ -452,15 +452,26 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
    did not yet write down. Commit and push.
-2. Start your successor as a Desktop session, with `start_session` (`initiation` "user_asked", `context`
-   "fresh", `cwd` the project, `use_worktree` false, `permission_mode` "auto", `name` `deputy-<n+1>`,
-   prompt `/deputy <project>: you take over from <your name>; read '## Deputy handover' in
-   factory/PLAN.md first`). Never `claude --bg`: a terminal background session has neither the
-   browser pane (Codex rounds) nor the routine scope (`RemoteTrigger` answers 401), so it can merge
-   but dispatch nothing (deputy-4, 2026-11-25). The new session is linked to you and its turns wake
-   you: from then on answer each such note with nothing and end.
-3. Stop your background watchers (`TaskStop`), tell the human in one line that the deputy now runs as
-   `deputy-<n+1>` (in the Desktop app's sidebar), and end your turn. Do nothing after that.
+2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled
+   **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
+   hands to Rock). The human made
+   them once; none started another, so no session gets a note on another's turns. Find the next one
+   by its title (`list_sessions`) and send it one message (`SendMessage`, `to` its `local_...` id):
+   `Invoke the deputy skill (/deputy <project>): you take over from <your title>; read '## Deputy
+   handover' in factory/PLAN.md first.` Say "invoke the deputy skill" in words: a slash command in
+   another session's message does not run as a skill. A "queued" delivery is fine: it runs when that
+   session is idle. Never `start_session` (refused on an automated turn, and its child would send you
+   a note on every turn: deputy-6, 2026-11-25, lost a night to it) and never `claude --bg` (no
+   browser pane, no routine scope: deputy-4, 2026-11-25).
+3. Stop your background watchers (`TaskStop`), tell the human in one line which session now runs the
+   factory, then clear your own context: `clear_session` with `session_id` "self" (it clears when this
+   turn ends). **The human asks every deputy to clear itself at handover (2026-11-26)**, so that the
+   session wakes empty at its next turn; the transcript stays on disk and behind "Resume previous
+   session". If a hook's rewrite of its input gets the clear refused, call it once more. End your turn
+   and do nothing after that.
 
-Taking over: read `## Deputy handover`, start the one watcher (`watch-all.sh`, a fresh state file:
-its first run records a baseline), then delete the section, commit and push.
+Taking over (a message from the previous deputy of the rotation, into an empty context): read
+`## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
+task page as they are now and act on what changed, since your watcher's first run only records a
+baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
+commit and push.
