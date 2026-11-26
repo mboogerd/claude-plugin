@@ -481,7 +481,13 @@ in the rotation (2026-11-26).** It clears when this turn ends, and the transcrip
 "Resume previous session". If a hook's rewrite of its input gets the clear refused, call it once
 more.
 
-Taking over (a message from the previous deputy of the rotation, usually into an empty context): read
+Taking over (a message from the previous deputy of the rotation, usually into an empty context):
+first get the latest plugin. A clear does not reload plugins, and a slash command such as
+`/reload-plugins` does not run from your own output, so update on disk and read the new text yourself:
+`claude plugin marketplace update mboogerd && claude plugin update mboogerd@mboogerd`, then read
+`installPath` for `mboogerd@mboogerd` in `~/.claude/plugins/installed_plugins.json`. If it differs
+from the base directory this skill loaded from, read `<installPath>/skills/deputy/SKILL.md` and follow
+that text instead of this one from here on. Then read
 `## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
 task page as they are now and act on what changed, since your watcher's first run only records a
 baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
