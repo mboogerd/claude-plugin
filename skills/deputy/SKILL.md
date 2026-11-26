@@ -268,6 +268,9 @@ Follow .claude/factory/review-lead.md: it is your whole job, and this brief only
 <Claude: post the review as one PR comment with your GitHub tools; if you have none, end with it as
 your final message. Codex: end with it as your final message.>
 ```
+The lead's rules live in `<collection>/factory/review-lead.md`; `sync.sh` copies them to
+`.claude/factory/`. A project that keeps its own factory has no copy (watane, today): in its brief,
+put that file's text in place of the `Follow` line, behind "Your whole job:".
 
 **Answer** (round `r`, to the builder):
 ```
