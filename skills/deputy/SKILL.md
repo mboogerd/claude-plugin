@@ -390,6 +390,20 @@ While a rung 2 or 3 question is open, the build team builds the option that keep
 so no slice waits idle; unless no stub, fake or narrower interface keeps them open and the question
 blocks all progress: then that slice waits, and you say so in the report.
 
+**Blocked is a claim, not a state.** "This waits on the human", "this lane is blocked" and "there
+is nothing to do" are claims, whoever made them (a team, an earlier deputy, you). Spend on checking
+one in proportion to what accepting it costs: nothing for a minute's wait, a quick look after a few
+minutes, real research when hours are at stake. Keep the evidence in one GitHub issue per open
+claim, labelled `evidence`, in the project that owns the fact (in the collection's repository when
+the claim spans projects): the claim, what was checked and how, what is still unknown. Whoever comes
+next first checks the thread, which costs less than redoing it, then adds a step of its own as a
+comment, so the evidence grows with the wait. Close the issue with its conclusion; `PLAN.md` links
+only `#n`. The repositories are public: log only what may be public (no secret, token, personal
+data or private conversation, nothing the human called private). On 2026-11-26 two claims relayed
+unchecked across three deputies cost hours: S138 "needs a watane release" (CI built watane from a
+pinned commit; one line bumps it) and watane step 6 "needs the new repository" (the next slice was a
+design slice that needs none).
+
 When a decision changes a fact, the build team writes it into the spec that owns it with the
 `spec-change` skill. When you ask: add it under `Waiting on the human` with its brief, and go on.
 Use `AskUserQuestion` only while the human is at the keyboard: on a turn their own message started,
@@ -451,7 +465,8 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
    becomes a proposal to the human for a spec rule or a ladder change, since it marks a missing rule.
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
-   did not yet write down. Commit and push.
+   did not yet write down. A wait that is a claim (section 5, "Blocked is a claim") names its
+   evidence issue `#n`, not only its conclusion. Commit and push.
 2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled
    **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
    hands to Rock). The human made
@@ -492,5 +507,6 @@ that text instead of this one from here on, and read every other file of this pl
 standing sessions never restart, so this is the only way they get a new version. Then read
 `## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
 task page as they are now and act on what changed, since your watcher's first run only records a
-baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
+baseline. Treat each inherited blocker as a claim: check its evidence issue, and add your step there
+when the wait is long. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
 commit and push.
