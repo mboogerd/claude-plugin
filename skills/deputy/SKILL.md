@@ -452,8 +452,9 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
    did not yet write down. Commit and push.
-2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled **Rock**,
-   **Paper** and **Scissors** take turns, in that order (Scissors hands to Rock). The human made
+2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled
+   **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
+   hands to Rock). The human made
    them once; none started another, so no session gets a note on another's turns. Find the next one
    by its title (`list_sessions`) and send it one message (`SendMessage`, `to` its `local_...` id):
    `Invoke the deputy skill (/deputy <project>): you take over from <your title>; read '## Deputy
@@ -470,5 +471,7 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
    and do nothing after that.
 
 Taking over (a message from the previous deputy of the rotation, into an empty context): read
-`## Deputy handover`, start the one watcher (`watch-all.sh`, a fresh state file:
-its first run records a baseline), then delete the section, commit and push.
+`## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
+task page as they are now and act on what changed, since your watcher's first run only records a
+baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
+commit and push.
