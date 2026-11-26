@@ -38,9 +38,10 @@ projects, the public interfaces, the formats on disk or on the wire, and the sec
 how to the foreman.
 
 **The chain.** The config's spec list is the priority of truth, highest first (why > what >
-how), then code. The order of work is the vision's steps in their order (or the build plan the
-chain names, when the vision has no steps), plus every step, milestone or slice added to the specs
-or `PLAN.md` while you run: re-read the vision and `PLAN.md` after each delivery and fold in what is
+how), then code. The order of work is the vision's Priorities, its outcomes in their rank, broken
+down into steps by the build plan (`PLAN.md`, or the plan the chain names; an older vision may
+still hold numbered steps: read them as its Priorities), plus every step, milestone or slice added
+to the specs or `PLAN.md` while you run: re-read the vision and `PLAN.md` after each delivery and fold in what is
 new, in its place. A draft spec is not yet a
 contract: its open points go to the human (section 5) before a build slice depends on them.
 
@@ -57,7 +58,8 @@ After every commit on `main`, `git -C "$P" push origin main`: cloud teams start 
    deliberation calls to Codex (section 5; `README`, "Nothing runs on the Mac").
 2. **Lanes by area.** Fill the target from these lanes, so that one blocked chain never empties the
    factory; keep one sketch ahead in each lane:
-   - the main line: the next step of the order of work in each active project;
+   - the main line: the next step toward the highest open outcome of the order of work in each
+     active project;
    - upkeep: one standing upkeep slice per active project while its `Upkeep` holds work (section 2);
    - consumer halves: a project's slice that uses another project's interface, built against that
      interface as written, with a fake, beside the provider's slice (section 2).
@@ -350,7 +352,8 @@ its slice. The protocol, the record and the human's brief are in [`deliberation.
 **Classify first** (in your head for rung 1, in the record for rungs 2 and 3), by facts: a model's
 stated confidence is no signal, since models state 80 to 100% and are overconfident.
 - Door H (the human's only): a change to a VISION document at any level (a goal, a boundary, a
-  non-goal, the order of work); a weaker security check or boundary (the config's `boundaries`);
+  non-goal, a trade-off, the Priorities); a weaker security check or boundary (the config's
+  `boundaries`);
   deleting data a person made or that cannot be restored; an act outside the repositories
   (publishing, a message to a person, money, an account); a new or archived project. Door C (costly
   to undo): an interface between parts or projects; a public interface (CLI, API, a file a person
