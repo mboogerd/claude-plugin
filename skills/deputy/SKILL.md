@@ -162,7 +162,9 @@ Mark the slice `in flight (cloud, builder <vendor>)` in `PLAN.md`, commit and pu
 build brief (section 4a) to the builder's side (4b or 4c), put the routine id or the Codex task
 URL on the slice's line. **One watcher for every slice in every project**, with Bash
 `run_in_background`: `<collection>/factory/scripts/watch-all.sh <state file> [<max seconds>] [<repo> ...]`
-(the collection's copy; the state file in your scratchpad, so it survives your restarts of it). It
+(the collection's copy; the state file is `~/.cache/factory-deputy/watch.state` (`mkdir -p` its folder once), one for every deputy of
+the rotation, outside any session's scratchpad, so it survives your restarts and your handover: the
+next deputy watches on from where you stopped, and nothing that changed between you is lost). It
 returns only on what needs you: a PR opened or closed, a new comment, a head whose subject is
 `DELIVERED`, `BLOCKED` or `<id> r<r>: answers`, or a PR's CI going from pending to all done; it
 prints one line per such slice. Start it again after each wake; never run a second one beside it.
@@ -451,10 +453,12 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
    becomes a proposal to the human for a spec rule or a ladder change, since it marks a missing rule.
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
-   did not yet write down. Commit and push.
-2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled **Rock**,
-   **Paper** and **Scissors** take turns, in that order (Scissors hands to Rock). The human made
-   them once; none started another, so no session gets a note on another's turns. Find the next one
+   did not yet write down; every wait the watcher does not cover (a Codex task in flight, a background
+   CI watch). Commit and push.
+2. Stop your background watchers (`TaskStop`) first, so that two never share the state file. Then
+   wake the next deputy of the rotation. Three standing top-level Desktop sessions titled
+   **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
+   hands to Rock). The human made them once; none started another, so no session gets a note on another's turns. Find the next one
    by its title (`list_sessions`) and send it one message (`SendMessage`, `to` its `local_...` id):
    `Invoke the deputy skill (/deputy <project>): you take over from <your title>; read '## Deputy
    handover' in factory/PLAN.md first.` Say "invoke the deputy skill" in words: a slash command in
@@ -462,13 +466,14 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
    session is idle. Never `start_session` (refused on an automated turn, and its child would send you
    a note on every turn: deputy-6, 2026-11-25, lost a night to it) and never `claude --bg` (no
    browser pane, no routine scope: deputy-4, 2026-11-25).
-3. Stop your background watchers (`TaskStop`), tell the human in one line which session now runs the
-   factory, then clear your own context: `clear_session` with `session_id` "self" (it clears when this
-   turn ends). **The human asks every deputy to clear itself at handover (2026-11-26)**, so that the
+3. Tell the human in one line which session now runs the factory, then clear your own context:
+   `clear_session` with `session_id` "self" (it clears when this turn ends). **The human asks every deputy to clear itself at handover (2026-11-26)**, so that the
    session wakes empty at its next turn; the transcript stays on disk and behind "Resume previous
    session". If a hook's rewrite of its input gets the clear refused, call it once more. End your turn
    and do nothing after that.
 
 Taking over (a message from the previous deputy of the rotation, into an empty context): read
-`## Deputy handover`, start the one watcher (`watch-all.sh`, a fresh state file:
-its first run records a baseline), then delete the section, commit and push.
+`## Deputy handover`, then start the one watcher on the shared state file
+(`~/.cache/factory-deputy/watch.state`, never a fresh one): its first pass wakes you on anything that
+changed since the last deputy's last pass. Pick up every other wait the handover lists (a Codex task
+page to read, a CI run to watch). Then delete the section, commit and push.
