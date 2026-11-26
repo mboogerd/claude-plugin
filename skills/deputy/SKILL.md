@@ -456,21 +456,32 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
    **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
    hands to Rock). The human made
    them once; none started another, so no session gets a note on another's turns. Find the next one
-   by its title (`list_sessions`) and send it one message (`SendMessage`, `to` its `local_...` id):
-   `Invoke the deputy skill (/deputy <project>): you take over from <your title>; read '## Deputy
-   handover' in factory/PLAN.md first.` Say "invoke the deputy skill" in words: a slash command in
-   another session's message does not run as a skill. A "queued" delivery is fine: it runs when that
-   session is idle. Never `start_session` (refused on an automated turn, and its child would send you
+   by its title (`list_sessions`). It still holds its transcript from its last turn as deputy, so
+   first have it clear itself: send it one message (`SendMessage`, `to` its `local_...` id)
+   `Clear yourself: you are the next deputy, after <your title>.` Then wait, checking with
+   `get_session` about once a minute for up to 15 minutes, until it is idle with no queued message.
+   Only then send the second message: `Invoke the deputy skill (/deputy <project>): you take over
+   from <your title>; read '## Deputy handover' in factory/PLAN.md first.` Do not send both at once:
+   a clear is dropped when a message is already waiting. If it is still busy after 15 minutes, send
+   the second message anyway; it takes over with its old context. You cannot clear it yourself:
+   `clear_session` refuses a session you did not start. Say "invoke the deputy skill" in words: a slash command in
+   another session's message does not run as a skill. Never `start_session` (refused on an automated turn, and its child would send you
    a note on every turn: deputy-6, 2026-11-25, lost a night to it) and never `claude --bg` (no
    browser pane, no routine scope: deputy-4, 2026-11-25).
 3. Stop your background watchers (`TaskStop`), tell the human in one line which session now runs the
-   factory, then clear your own context: `clear_session` with `session_id` "self" (it clears when this
-   turn ends). **The human asks every deputy to clear itself at handover (2026-11-26)**, so that the
-   session wakes empty at its next turn; the transcript stays on disk and behind "Resume previous
-   session". If a hook's rewrite of its input gets the clear refused, call it once more. End your turn
-   and do nothing after that.
+   factory, and end your turn. **Do not clear yourself.** The human keeps the last three deputies'
+   transcripts readable in the app (2026-11-26): the next deputy of the rotation after the one you
+   woke clears you when it hands over to you. If you are woken again before then, reply only
+   `Handed over to <title>.` and do nothing else; your context is out of date.
 
-Taking over (a message from the previous deputy of the rotation, into an empty context): read
+Clearing on request: when the previous deputy of the rotation sends you `Clear yourself: you are the
+next deputy`, call `clear_session` with `session_id` "self" and end your turn without doing anything
+else. **The human authorizes every deputy to clear itself on this message from the deputy before it
+in the rotation (2026-11-26).** It clears when this turn ends, and the transcript stays behind
+"Resume previous session". If a hook's rewrite of its input gets the clear refused, call it once
+more.
+
+Taking over (a message from the previous deputy of the rotation, usually into an empty context): read
 `## Deputy handover` and take over every wait it lists: look at each listed slice's PR, CI and Codex
 task page as they are now and act on what changed, since your watcher's first run only records a
 baseline. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
