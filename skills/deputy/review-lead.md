@@ -17,8 +17,8 @@ yourself: their reviews must not see each other's or yours. Give each its file a
 
 Run them one after another, in that order: they share your checkout. Where an agent says to commit
 a red test, it puts the test's code in its finding instead and leaves the checkout clean. The build
-team's logs (`factory/runs/`) are not in your clone: run `.claude/factory/check.sh <id>` once
-yourself. A check that needs a Mac is CI's: read its job on the PR, and make a finding if the job is
+team's logs (`factory/runs/`) are not in your clone: run the `gate` of `factory/config.toml`
+once yourself. A check that needs a Mac is CI's: read its job on the PR, and make a finding if the job is
 missing.
 
 Round 1: the whole diff (`git diff origin/main...slice/<id>`). Later rounds: first each answer in
