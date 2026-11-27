@@ -2,6 +2,6 @@
   "name": "mboogerd",
   "description": "Personal skills: the spec system, the software factory's deputy and foreman, planning, architecture audits, and style guides.",
   "author": { "name": "mboogerd" },
-  "version": "0.1.7",
+  "version": "0.1.8",
   "repository": "https://github.com/mboogerd/claude-plugin"
 }

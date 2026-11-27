@@ -44,9 +44,26 @@ or `PLAN.md` while you run: re-read the vision and `PLAN.md` after each delivery
 new, in its place. A draft spec is not yet a
 contract: its open points go to the human (section 5) before a build slice depends on them.
 
-You alone edit `$P/factory/PLAN.md`, on `main`. Commit it by path (`git -C "$P" commit
-factory/PLAN.md -m ...`), never `-a` or `add -A`: another session may have edits in that checkout.
-After every commit on `main`, `git -C "$P" push origin main`: cloud teams start from `origin/main`.
+You alone edit `$P/factory/PLAN.md`. Commit it by path (`git -C "$P" commit factory/PLAN.md -m ...`),
+never `-a` or `add -A`: another session may have edits in that checkout. `main` takes no direct
+push, not even from an admin: its ruleset has no bypass. Send each commit as a PR from a `plan/*`
+branch and let it merge itself: `git -C "$P" push origin HEAD:refs/heads/plan/<stamp>`, `gh pr create
+--head plan/<stamp> --fill`, `gh pr merge --auto --rebase`, then `git -C "$P" pull --rebase origin
+main` once it merged. CI passes a PR that touches only planning files (`PLAN.md`, `DONE.md`,
+`factory/decisions/`) in about a minute. Cloud teams start from `origin/main`, so dispatch only after
+the sketch's PR merged.
+
+**`PLAN.md` holds the present, nothing else**, and CI fails it past 500 lines:
+- the slices in flight and the next sketch of each lane (section 1);
+- `Waiting on the human`;
+- `Deputy decisions` still in the human's veto window: until your next report to the human lists
+  them. After that report, write each into the spec that owns its fact (the `spec-change` skill)
+  or, for a process rule, propose it as a factory change (section 7), and delete its line;
+- open `Friction` lines: delete one once it was acted on (a factory change, a task, a decision);
+- `Deputy handover`, only while one is in progress (section 8).
+History goes elsewhere: a merged slice's sketch and digest line to `factory/DONE.md` (section 6),
+leftover work to GitHub issues (section 2, "Upkeep"). Before each plan PR, delete what no longer
+belongs; a PR that CI fails on the size check is pruned, never the limit raised.
 
 ## 1. The loop
 
@@ -58,7 +75,7 @@ After every commit on `main`, `git -C "$P" push origin main`: cloud teams start 
 2. **Lanes by area.** Fill the target from these lanes, so that one blocked chain never empties the
    factory; keep one sketch ahead in each lane:
    - the main line: the next step of the order of work in each active project;
-   - upkeep: one standing upkeep slice per active project while its `Upkeep` holds work (section 2);
+   - upkeep: one standing upkeep slice per active project while it has open `upkeep` or `flaky` issues (section 2);
    - consumer halves: a project's slice that uses another project's interface, built against that
      interface as written, with a fake, beside the provider's slice (section 2).
    Pick the sketches of the lanes so that their `Touches` do not overlap.
@@ -118,12 +135,19 @@ slice in flight is one. The foreman splits it over parallel implementers when it
 20 tasks comes back to you as a split proposal (`BLOCKED`). A sketch of a few hours' work without
 such a reason joins the next sketch instead.
 
-Small work that is no story (fixes, flakes, follow-ups, `Friction` items, test-cost cuts) waits
-under `Upkeep` in `PLAN.md`. It runs in its own lane (section 1): while `Upkeep` holds work, one
-upkeep slice per active project is in flight or sketched, guards first, then the items in the
-folders no other slice in flight touches. Its outcomes are each item's check, not a story, and it is
-exempt from the size rule below. A fix that guards `main` or unblocks a slice in flight does not
-wait for the next upkeep slice.
+**Upkeep** is small work that is no story (fixes, flakes, follow-ups, test-cost cuts). Each item is
+one GitHub issue in the project, labelled `upkeep` and one of `guard`, `core` or `polish` (what it
+protects), with the finding's text, file:line and the PR it came from. CI opens the `flaky` ones
+itself. Never keep a list of them in `PLAN.md`: an issue closes itself when the PR that fixes it
+says `Fixes #<n>`, so the open issues are always what is left, and no slice spends time proving that
+an item is already done. Upkeep runs in its own lane (section 1): while open `upkeep` or `flaky`
+issues exist, one upkeep slice per active project is in flight or sketched; its sketch lists issue
+numbers, guards and flakes first, then the items in the folders no other slice in flight touches.
+Its outcomes are each issue's check, not a story, and it is exempt from the size rule below; the
+build team closes an issue it finds already fixed on `main` with the commit that fixed it, and
+the PR body lists `Fixes #<n>` for each other one. A fix that guards `main` or unblocks a slice in
+flight does not wait for the next upkeep slice. Close an issue nobody will ever fix as `not
+planned`, with why: an issue is not a place to keep a wish.
 
 Keep it a sketch: the foreman plans the slice and writes the task briefs.
 
@@ -162,7 +186,7 @@ and `[agents]` names other agent files for a role. Rules 1 and 4 hold for every 
 
 ### Hand it out
 
-Mark the slice `in flight (cloud, builder <vendor>)` in `PLAN.md`, commit and push. Dispatch the
+Mark the slice `in flight (cloud, builder <vendor>)` in `PLAN.md`, commit and send it as a plan PR (section 0). Dispatch the
 build brief (section 4a) to the builder's side (4b or 4c), put the routine id or the Codex task
 URL on the slice's line. **One watcher for every slice in every project**, with Bash
 `run_in_background`: `<collection>/factory/scripts/watch-all.sh <state file> [<max seconds>] [<repo> ...]`
@@ -183,9 +207,9 @@ opens) and ends when the builder pushes its answers to review `r`.
 | The watcher shows (per slice) | You do |
 |---|---|
 | a PR opened (or `nopr` with a `DELIVERED` commit: open the PR yourself, `gh pr create --head slice/<id> --body-file <its body>`) | dispatch review brief, round 1, to the reviewer's side |
-| a new head with subject `<id> r<r>: answers` | dispatch review brief, round `r+1` |
+| a new head with subject `<id> r<r>: answers` | wait for CI on that head to finish; all green: dispatch review brief, round `r+1`; a red job: it goes to the builder as finding `F<r>.ci` (section 6, item 2), no review yet |
 | a comment ending `VERDICT: changes (n)` | weigh the round (below), then dispatch answer brief, round `r`, to the builder's side |
-| a comment ending `VERDICT: approve` | its polish to `Upkeep` (below), then section 6 |
+| a comment ending `VERDICT: approve` | its polish as `upkeep` issues (below), then section 6 |
 | a head with subject `BLOCKED <id>` | answer it (section 5), then a build brief "continue from branch `slice/<id>`; the answer: ..." |
 | the timer, a Codex task in flight | open its task page (4c); finished: carry its result to the PR as below |
 | CI all done on a delivered PR whose review is not yet out | dispatch review round 1 if all green; a red job goes to the builder as a finding |
@@ -205,8 +229,9 @@ You weigh that call against the vision and functional spec, which you know bette
   promised boundary falls to an attacker the spec names; a failure that needs two or more unusual
   events together, or is of the same kind as a limit already accepted, is an accepted risk unless
   the vision promises otherwise. Hold the lead to this; regrade a finding that breaks it.
-- **Polish** (wording, docs, cosmetics, nice-to-haves) never holds a merge. Put each polish finding
-  under `Upkeep` in `PLAN.md` when you merge; the builder may fix it on the way if it is cheap.
+- **Polish** (wording, docs, cosmetics, nice-to-haves) never holds a merge. Open one `upkeep`
+  `polish` issue per polish finding when you merge, or none when it is not worth an issue (say so
+  in one line); the builder may fix it on the way if it is cheap.
 - **Accepted** findings: the lead proposes to accept a finding as a risk when fixing it costs more
   than it is worth for the vision. It must do so at once when the spec already puts the finding out
   of scope (an attacker or case its "Not protected" or non-goals name, unless one the boundary does
@@ -228,7 +253,7 @@ You weigh that call against the vision and functional spec, which you know bette
 - **Cut early, yourself.** When one part of a slice is stalled, cut it by round 3: rule the minimal
   version against the spec's literal words (what it keeps, what becomes a known limit), send it to
   the builder as the next answer's ruling, and merge on approval as usual. Record the cut on the
-  slice's line, put the dropped part under `Upkeep` or as the next slice's sketch, and list it once
+  slice's line, put the dropped part in an `upkeep` issue or the next slice's sketch, and list it once
   under `Cuts` in your report; the human may veto it, and the undo is that follow-up slice. Do not
   wait for the human: a cut held overnight costs a night. Ask first (section 5) only when the cut
   drops something a vision document promises or weakens a security check.
@@ -439,12 +464,12 @@ bypass; `--admin` is never needed for it, and a merge that GitHub refuses withou
    in a build or lint step, goes to the builder as an answer brief with the job and its lines as
    finding `F<r>.ci`, and the push after it gets one more review round.
 3. `gh pr merge <n> --rebase`; a branch with merge commits of main takes `--squash`. Then `git -C "$P" pull --rebase origin main`. A red CI run
-   on `main`: fix `main` first, with a fix slice next.
-4. Mark the slice
-   done in `PLAN.md` with one digest line (what a person can now do), the builder and the rounds, its
-   decisions and friction lines, its suite times and its hours in flight. Move its sketch out of
-   `PLAN.md` to the end of `factory/DONE.md` (read it only when a question needs it): `PLAN.md` is
-   read on every wake and must not grow with history. Commit and push.
+   on `main`: a test that fails there and passed on the PR is a flake, and CI opens its `flaky`
+   issue; anything else: fix `main` first, with a fix slice next.
+4. Move the slice's sketch out of `PLAN.md` to the end of `factory/DONE.md` (read it only when a
+   question needs it), with one digest line there (what a person can now do), the builder and the
+   rounds, its suite times and its hours in flight. Its decision and friction lines stay in
+   `PLAN.md` only while they are open (section 0). Commit and send it as a plan PR.
 5. Report to the human: one line per slice, project first, decisions first. Per run, say what moved
    the vision forward and what was upkeep: a run of only upkeep is a finding, not a full factory.
 6. Hand over if it is time (section 8).
@@ -475,7 +500,7 @@ in hand (a merge, a dispatch) and hand over now; do not wait for the next merge:
 1. Write `## Deputy handover` at the top of `PLAN.md`: for each slice in flight, its id, builder and
    reviewer, the routine ids, Codex task URLs or session id, PR, round, and what you wait on; questions you sent and their state; what you decided but
    did not yet write down. A wait that is a claim (section 5, "Blocked is a claim") names its
-   evidence issue `#n`, not only its conclusion. Commit and push.
+   evidence issue `#n`, not only its conclusion. Commit and send it as a plan PR.
 2. Wake the next deputy of the rotation. Three standing top-level Desktop sessions titled
    **Deputy Rock**, **Deputy Paper** and **Deputy Scissors** take turns, in that order (Scissors
    hands to Rock). The human made
@@ -518,4 +543,4 @@ standing sessions never restart, so this is the only way they get a new version.
 task page as they are now and act on what changed, since your watcher's first run only records a
 baseline. Treat each inherited blocker as a claim: check its evidence issue, and add your step there
 when the wait is long. Then start the one watcher (`watch-all.sh`, a fresh state file), delete the section,
-commit and push.
+commit and send it as a plan PR.

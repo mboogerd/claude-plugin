@@ -113,7 +113,7 @@ not independent.
 ## 7. The record
 
 Rung 1 is one line under `Deputy decisions` in `PLAN.md`. Rungs 2 and 3 each get a file
-`factory/decisions/D<nnn>-<slug>.md` (the next free number), which you commit to `main` by path, as
+`factory/decisions/D<nnn>-<slug>.md` (the next free number), which you commit by path and send in a plan PR, as
 `PLAN.md`, and one line under `Deputy decisions` or `Waiting on the human` that links it. It holds:
 
 ```yaml

@@ -21,6 +21,12 @@ team's logs (`factory/runs/`) are not in your clone: run the `gate` of `factory/
 once yourself. A check that needs a Mac is CI's: read its job on the PR, and make a finding if the job is
 missing.
 
+**No verdict before CI is done.** Every job of the PR's CI at the reviewed sha must have finished
+before you write the verdict (`gh pr checks <n> --watch`; without GitHub tools, the PR's checks
+page). A red job is a blocking finding `F<r>.ci` with its job and failing lines, whatever your
+agents found: the builders and you check on Linux, and macOS and Windows are often the only place a
+platform difference shows. Never approve on condition that a job passes.
+
 Round 1: the whole diff (`git diff origin/main...slice/<id>`). Later rounds: first each answer in
 the last commit's body ("fixed in <sha>": check the fix; "disagree: <why>": accept or keep the
 finding, and say why), then the diff since the reviewed sha, and every outcome it can affect.
@@ -39,7 +45,8 @@ The agents report to you, not to the PR. Triage what they found, in the light of
   a disk or storage error, a refusal plus a reload or a session switch, a race between renders or
   threads) is a proposed accepted risk, unless you judge it worth fixing: then say why;
 - precedent: a finding of the same kind as a limit already accepted (any spec's "Not protected"
-  or known limits, `Human answers` or `Deputy decisions` in `factory/PLAN.md`) is that limit: name
+  or known limits and recorded decisions, `Human answers` or `Deputy decisions` in
+  `factory/PLAN.md`) is that limit: name
   it and propose it as accepted, never blocking;
 - a security or boundary finding is never polish, and never blocking by reflex: weigh it against
   the threat model and the vision, as your agents do not. Propose to accept as a risk, with why
