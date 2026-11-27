@@ -198,7 +198,7 @@ link>)`. Change nothing in it; the review is the reviewer's, you are the mail.
 
 **Progress, not a cap.** The goal is many features that work, not few that are perfect: a round is
 worth it only while it removes defects that matter for the vision. There is no fixed number of
-rounds. The review lead triages its agents' findings (`.claude/factory/review-lead.md`) and ends each review with
+rounds. The review lead triages its agents' findings ([review-lead.md](review-lead.md)) and ends each review with
 the trend and its call: `another round`, `merge` (what is left is polish or accepted) or `stalled`.
 You weigh that call against the vision and functional spec, which you know better than the lead:
 - **Impact times likelihood.** Blocking means the slice's story fails on a plausible path, or a
@@ -264,10 +264,14 @@ to it, edit none of its files beyond a wiring line, and merge main into slice/<i
 ```
 You are the review lead for PR #<n> (<owner/repo>, branch slice/<id>), round <r>; the trend so far
 (blocking/polish per round): <trend, or "none">; reviewed sha: <sha, or "none">.
-Follow .claude/factory/review-lead.md: it is your whole job, and this brief only fills it in.
+Your whole job is below; this brief only fills it in.
 <Claude: post the review as one PR comment with your GitHub tools; if you have none, end with it as
 your final message. Codex: end with it as your final message.>
+
+<the text of review-lead.md, beside this skill, verbatim>
 ```
+The lead's rules live only in [review-lead.md](review-lead.md), and travel in the brief: a cloud
+session loads no plugins, and no project keeps a copy that could go stale.
 
 **Answer** (round `r`, to the builder):
 ```
