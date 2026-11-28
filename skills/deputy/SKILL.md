@@ -349,6 +349,11 @@ with no screenshots:
    the slice's line.
 Only when the chip shows another environment: click it, press ↓, then → to expand **Cloud**, pick
 `codex_env`, and check the chip before step 2.
+**The model is GPT-6 Sol** (the human, 2026-11-28): the composer shows the model beside the effort
+(`GPT-6 Sol Light`). If it shows another, click it, click the model name, pick **GPT-6 Sol**, press
+Escape, and check it before step 2. GPT-6.2 Sol and GPT-6.2 Astra keep OpenAI's standard cyber
+safeguards even under Daybreak Blue and withheld a whole review as "This content can't be shown"
+(watane S162 r2); GPT-6 Sol gets Blue's reduced refusals and returned the same brief.
 
 Codex pushes and opens or updates the PR itself through its GitHub integration, as the human's
 account. That account is an admin, so no ruleset holds it to `slice/*`: only the brief does. After
@@ -370,6 +375,8 @@ the PR and branch in the next brief again.
   and meanwhile build or review that slice with Claude.
 - *The pane is hidden* (`tabs_context`): ask the human to show it; the page still works hidden, but
   read it as text, not by screenshot.
+- *A result withheld* ("This content can't be shown"): check the model first; on GPT-6.2, send the
+  same brief once more on GPT-6 Sol.
 - *The task fails or stops* (an error on its page, or no change for two timer rounds after it says
   it is done): send the same brief once more as a new task; a second failure is a friction line, and
   that round goes to Claude.
