@@ -350,8 +350,9 @@ with no screenshots:
 Only when the chip shows another environment: click it, press ↓, then → to expand **Cloud**, pick
 `codex_env`, and check the chip before step 2.
 **The model is GPT-6 Sol** (the human, 2026-11-28): the composer shows the model beside the effort
-(`GPT-6 Sol Light`). If it shows another, click it, click the model name, pick **GPT-6 Sol**, press
-Escape, and check it before step 2. GPT-6.2 Sol and GPT-6.2 Astra keep OpenAI's standard cyber
+(`GPT-6 Sol Light`), and every new task starts on the default again. If it shows another, click it,
+click the model name, then pick **GPT-6 Sol** by name (`find "GPT-6 Sol"`: the list's order changes),
+press Escape, and check it before step 2. GPT-6.2 Sol and GPT-6.2 Astra keep OpenAI's standard cyber
 safeguards even under Daybreak Blue and withheld a whole review as "This content can't be shown"
 (watane S162 r2); GPT-6 Sol gets Blue's reduced refusals and returned the same brief.
 
